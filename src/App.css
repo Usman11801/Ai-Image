@@ -199,29 +199,20 @@
 
 .genratebtn {
   /* ///////// */
-  background-image: url("../src/Assets/testGenerateBtn.svg");
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
+  /* background-image: url("../src/Assets/GENERATE.png"); */
+  /* background-repeat: no-repeat; */
+  /* background-size: cover; */
+  /* background-size: 100% 100%; */
+  background: linear-gradient(to bottom, #79a4c1 0%, #184a8b 100%);
   font-family: "Tomorrow";
   font-style: italic;
   font-style: normal;
-  /* font-weight: 600; */
   font-size: 1rem;
-  /* line-height: 19px; */
-  /* color: #b6eef5; */
   width: 180px;
   height: 3rem;
-
-  /* display: flex; */
-  /* align-items: center; */
-  /* justify-content: center; */
-  /* background-image: ; */
-  /* background: linear-gradient(to bottom, #0a3136, #046774, #35d1e4); */
-  border-radius: 8px;
+  border: none;
+  border-radius: 14px;
   color: white;
-  /* background-size: 150%; */
-  /* transition: background-position 0.5s; */
-  /* border: 2px solid #b6eef5; */
 }
 
 .fixPosition {

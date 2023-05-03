@@ -25,6 +25,11 @@ const Navbar = () => {
       if (event.key === "access") {
         setIsSignBtn(!!event.newValue);
       }
+      if (event.key === "accessChanged") {
+        // Add this condition
+        setIsSignBtn(false);
+        localStorage.removeItem("accessChanged");
+      }
     };
 
     window.addEventListener("storage", handleStorageChange);
@@ -40,7 +45,7 @@ const Navbar = () => {
   };
 
   const signOut = () => {
-    localStorage.removeItem("access");
+    localStorage.clear();
     setIsSignBtn(false);
     setShowOptions(false);
   };

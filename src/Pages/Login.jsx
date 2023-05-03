@@ -3,9 +3,6 @@ import { useState } from "react";
 
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-// import { ToastContainer } from "react-toastify";
-// import { toast } from "react-toastify";
-// import "react-toastify/dist/ReactToastify.css";
 
 function Login() {
   const [sign, setSign] = useState(false);
@@ -39,12 +36,15 @@ function Login() {
           response.json().then((data) => {
             // Save the response data in the local storage
             // localStorage.setItem("userData", JSON.stringify(data));
+            console.log(data);
+            localStorage.setItem("id", JSON.stringify(data.id));
             localStorage.setItem("access", JSON.stringify(data.access));
             localStorage.setItem("email", JSON.stringify(data.email));
             localStorage.setItem("refresh", JSON.stringify(data.refresh));
             localStorage.setItem("token", JSON.stringify(data.token));
             // Close the popup
             setOn(false);
+            // window.location.reload();
           });
         } else {
           // Login failed

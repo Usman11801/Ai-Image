@@ -1,11 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Grid, Paper } from "@material-ui/core";
 import "../index.css";
 import center from "../Assets/centerIMG.png";
 import center2 from "../Assets/center2.png";
 import errowDown from "../Assets/errowDown.png";
-import SliderComponent from "./SliderComponent";
 import { Slider } from "antd";
+import { css } from "@emotion/react";
+import { ClipLoader } from "react-spinners";
+
+const override = css`
+  display: block;
+  margin: 0 auto;
+  border-color: red;
+`;
 
 const marks = {
   1: "1",
@@ -20,6 +27,8 @@ const SideBar = () => {
     setOn(!on);
   };
   const [value, setValue] = useState(1);
+  const [data, setData] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const [selectedCardIndex, setSelectedCardIndex] = useState(-1);
   const [selectedDetails, setSelectedDetails] = useState([]);
@@ -37,6 +46,30 @@ const SideBar = () => {
   const [numberImages, setNumberImages] = useState(1);
   const [ratio, setRatio] = useState();
   const [inputValue, setInputValue] = useState("");
+
+  const imageRef = useRef(null);
+
+  const handleDownload = () => {
+    if (imageRef.current && imageRef.current.nodeName === "IMG") {
+      const link = document.createElement("a");
+      link.download = "my-image.png"; // specify the filename
+
+      const newImage = new Image();
+      newImage.crossOrigin = "anonymous";
+      newImage.src = saveImage;
+      newImage.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = newImage.width;
+        canvas.height = newImage.height;
+
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(newImage, 0, 0);
+
+        link.href = canvas.toDataURL(); // convert the canvas to data URL and set it as the href
+        link.click(); // trigger the download
+      };
+    }
+  };
 
   const handleInputChange = (event) => {
     setInputValue(event.target.value);
@@ -113,69 +146,69 @@ const SideBar = () => {
   };
   const cards = [
     {
-      title: "Card 1",
+      title: "anime",
       description: "Description of Card 1",
       image:
         "https://pub-static.fotor.com/assets/aiImageConfig/template/tt8qogmtefam.png",
     },
     {
-      title: "Card 2",
+      title: "cinematic",
       description: "Description of Card 2",
       image:
         "https://pub-static.fotor.com/assets/aiImageConfig/template/iqbl04mo6r0s.jpg",
     },
     {
-      title: "Card 3",
+      title: "digital-art",
       description: "Description of Card 3",
       image:
         "https://pub-static.fotor.com/assets/aiImageConfig/template/en7tjm0hmpnx.png",
     },
 
     {
-      title: "Card 4",
+      title: "enhance",
       description: "Description of Card 1",
       image:
         "https://pub-static.fotor.com/assets/aiImageConfig/template/13gvkimxgn9d.png",
     },
     {
-      title: "Card 5",
+      title: "fantasy-art",
       description: "Description of Card 2",
       image:
         "https://pub-static.fotor.com/assets/aiImageConfig/template/1psbxzaonp1c.jpg",
     },
     {
-      title: "Card 6",
+      title: "isometric",
       description: "Description of Card 3",
       image:
         "https://pub-static.fotor.com/assets/aiImageConfig/template/p9i0r6ft2qfp.png",
     },
 
     {
-      title: "Card 7",
+      title: "photographic",
       description: "Description of Card 1",
       image:
         "https://pub-static.fotor.com/assets/aiImageConfig/template/qnqtaw2me2o3.jpg",
     },
     {
-      title: "Card 8",
+      title: "origami",
       description: "Description of Card 2",
       image:
         "https://pub-static.fotor.com/assets/aiImageConfig/template/667doe5pzpro.png",
     },
     {
-      title: "Card 9",
+      title: "neon-punk",
       description: "Description of Card 3",
       image:
         "https://pub-static.fotor.com/assets/aiImageConfig/template/rafi0sjdv5qp.png",
     },
     {
-      title: "Card 10",
+      title: "pixel-art",
       description: "Description of Card 3",
       image:
         "https://pub-static.fotor.com/assets/aiImageConfig/template/rafi0sjdv5qp.png",
     },
     {
-      title: "Card 11",
+      title: "3d-model",
       description: "Description of Card 3",
       image:
         "https://pub-static.fotor.com/assets/text_to_image/picture_type/1-4.png",
@@ -305,23 +338,27 @@ const SideBar = () => {
       title: "Macro",
     },
   ];
+  const [saveImage, setSaveImage] = useState();
+
   const clickGenerate = () => {
+    debugger;
+    setLoading(true);
+
     console.log("numberImages", numberImages);
     console.log("ratio", ratio);
     console.log("styleCard", styleCard);
     console.log("inputValue", inputValue);
-
+    const id = localStorage.getItem("id");
     const data = {
       num_images: numberImages,
-      ratio: ratio.title,
+      ratio: ratio?.title,
       style: styleCard.title,
-      // text_input: inputValue,
-      text_input: "Flying car",
-
-      negative_input: "red",
+      id: id,
+      text_input: inputValue,
+      negative_input: "blue",
     };
 
-    fetch("http://127.0.0.1:8002/api/generate/images/", {
+    fetch("http://127.0.0.1:5000/api/generate/images/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -329,7 +366,12 @@ const SideBar = () => {
       body: JSON.stringify(data),
     })
       .then((response) => response.json())
-      .then((data) => console.log(data))
+      .then((data) => {
+        console.log(data?.image_urls);
+        setSaveImage(data.image_urls);
+        console.log("saveImage,", saveImage[0], "and", saveImage[1]);
+        // setLoading(false);
+      })
       .catch((error) => console.error(error));
   };
 
@@ -632,12 +674,126 @@ const SideBar = () => {
           <div className="Main-Content">
             <div className="flex align-item contentSetting">
               {/* <div className="card cardSize"></div> */}
+
               <div className="centercards">
-                <img src={center} />
-                <img src={center2} />
+                {loading ? (
+                  <>
+                    {saveImage ? (
+                      ""
+                    ) : (
+                      <div
+                        style={{
+                          height: "45vh",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        <ClipLoader
+                          css={override}
+                          size={150}
+                          color={"#123abc"}
+                          loading={loading}
+                        />
+                      </div>
+                    )}
+                    {saveImage ? (
+                      <>
+                        {numberImages > 1 ? (
+                          <>
+                            {numberImages === 2 ? (
+                              <>
+                                <img
+                                  style={{ width: "49%" }}
+                                  src={saveImage[0]}
+                                />
+                                <img
+                                  style={{ width: "49%" }}
+                                  src={saveImage[1]}
+                                />
+                              </>
+                            ) : (
+                              <>
+                                {numberImages === 3 ? (
+                                  <>
+                                    <img
+                                      style={{ width: "32%" }}
+                                      src={saveImage[0]}
+                                    />
+                                    <img
+                                      style={{ width: "32%" }}
+                                      src={saveImage[1]}
+                                    />
+                                    <img
+                                      style={{ width: "32%" }}
+                                      src={saveImage[2]}
+                                    />
+                                  </>
+                                ) : (
+                                  <>
+                                    <img
+                                      style={{ width: "24%" }}
+                                      src={saveImage[0]}
+                                    />
+                                    <img
+                                      style={{ width: "24%" }}
+                                      src={saveImage[1]}
+                                    />
+                                    <img
+                                      style={{ width: "24%" }}
+                                      src={saveImage[2]}
+                                    />
+                                    <img
+                                      style={{ width: "24%" }}
+                                      src={saveImage[3]}
+                                    />
+                                  </>
+                                )}
+                              </>
+                            )}
+                          </>
+                        ) : (
+                          <img style={{ width: "100%" }} src={saveImage[0]} />
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        {loading ? (
+                          ""
+                        ) : (
+                          <>
+                            {loading ? (
+                              ""
+                            ) : (
+                              <img
+                                style={{ width: "65%" }}
+                                src="https://static.fotor.com/app/minitools/aiimage/static/media/ai-image-no-task.861133f7.jpg"
+                              />
+                            )}
+                          </>
+                        )}
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <>
+                      {loading ? (
+                        ""
+                      ) : (
+                        <img
+                          style={{ width: "65%" }}
+                          src="https://static.fotor.com/app/minitools/aiimage/static/media/ai-image-no-task.861133f7.jpg"
+                        />
+                      )}
+                    </>
+                  </>
+                )}
               </div>
               <div className="btns-div">
-                <button className="btn-Style">Download</button>
+                <button className="btn-Style" onClick={handleDownload}>
+                  Download
+                </button>
                 <button className="btn-Style">Share</button>
                 <button className="btn-Style">Mint NFT</button>
                 <button className="btn-Style">Upscale</button>
