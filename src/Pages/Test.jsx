@@ -1,33 +1,58 @@
 import { useState, useEffect } from "react";
 
 export function Test() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [galleryData, setGalleryData] = useState([]);
+  const [error, setError] = useState(null);
+
   useEffect(() => {
     console.log("Working");
-    // const Token = localStorage.getItem("token");
-    const Token =
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjgzMDg1NzgyLCJpYXQiOjE2ODMwODIxODIsImp0aSI6ImNlNGFkMDkxM2RiMjQ3ODQ5ZGQ1NTRkYTEwMWEwZjIzIiwidXNlcl9pZCI6NH0.ZGA3btrA4uEuX3f-bwrYneU8RimtdyPnW8gmVddh2eQ";
-    console.log("tokentoken token:", Token);
+    const token = localStorage.getItem("token");
+    console.log("Token:", token);
+    if (!token) {
+      console.log("No token found in localStorage");
+      return;
+    }
     fetch("http://127.0.0.1:5000/api/gallery/images/", {
       headers: {
-        Authorization: `Bearer ${Token}`,
-        // "Content-Type": "application/json",
+        Authorization: `Token ${token}`,
       },
     })
-      .then((response) => response.json())
-      .then((data) => {
-        // setGalleryData(data);
-        console.log("galleryData,", data);
+      .then((response) => {
+        if (!response.ok) {
+          //           throw new Error(HTTP error! status: ${response.status});
+        }
+        return response.json();
       })
-      .catch((error) => console.error(error));
+      .then((data) => {
+        console.log("galleryData:", data);
+        setGalleryData(data);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.error(error);
+        setError(error);
+        setIsLoading(false);
+      });
   }, []);
 
   return (
     <div>
-      <h1>hi</h1>
-      {/* Display the API data */}
-      {/* {data.map((item) => (
-        <div key={item.id}>{item.name}</div>
-      ))} */}
+            <h1>hi</h1>     {" "}
+      {isLoading ? (
+        <div>Loading...</div>
+      ) : error ? (
+        <div>Error: {error.message}</div>
+      ) : (
+        <div>
+                   {" "}
+          {galleryData.map((item) => (
+            <div key={item.id}>{item.name}</div>
+          ))}
+                 {" "}
+        </div>
+      )}
+         {" "}
     </div>
   );
 }

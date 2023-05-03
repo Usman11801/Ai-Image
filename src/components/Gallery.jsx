@@ -35,13 +35,16 @@ function Gallery() {
     //   .catch((error) => console.error(error));
   }
   useEffect(() => {
-    // const Token = localStorage.getItem("token");
-    const Token = "adb8fc95c69ab0cd72e9cb332ba24674a2b2c2ef";
-    console.log("tokentoken token:", Token);
+    const storeToken = localStorage.getItem("token");
+    console.log();
+    // const token2 = "adb8fc95c69ab0cd72e9cb332ba24674a2b2c2ef";
+    // const storeToken = "adb8fc95c69ab0cd72e9cb332ba24674a2b2c2ef";
+    console.log("tokentoken token:", storeToken);
+
     fetch("http://127.0.0.1:5000/api/gallery/images/", {
       headers: {
-        Authorization: `Bearer ${Token}`,
-        // "Content-Type": "application/json",
+        Authorization: `Token ${storeToken}`,
+        "Content-Type": "application/json",
       },
     })
       .then((response) => response.json())

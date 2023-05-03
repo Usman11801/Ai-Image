@@ -11,13 +11,13 @@ import { Test } from "./Pages/Test";
 function App() {
   return (
     <>
-      <Test />
-      {/* <div className="appCreate">
+      {/* <Test /> */}
+      <div className="appCreate">
         <BrowserRouter>
           <Navbar />
           <Header />
         </BrowserRouter>{" "}
-      </div> */}
+      </div>
     </>
   );
 }
