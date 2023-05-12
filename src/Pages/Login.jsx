@@ -44,7 +44,7 @@ function Login() {
             localStorage.setItem("token", JSON.stringify(data.token));
             // Close the popup
             setOn(false);
-            // window.location.reload();
+            window.location.reload();
           });
         } else {
           // Login failed
@@ -98,35 +98,6 @@ function Login() {
         >
           {({ isSubmitting }) => (
             <Form>
-              {/* <div className="mb-4">
-                <div className="flex-style">
-                  <label
-                    htmlFor="firstName"
-                    className="block font-bold mb-2"
-                    style={{ fontSize: "1.2rem" }}
-                  >
-                    Your Name
-                  </label>
-                  <Field
-                    placeholder=" please enter name..."
-                    type="text"
-                    id="firstName"
-                    name="firstName"
-                    className="border p-2 rounded-lg w-full"
-                  />
-                </div>
-                <p
-                  className="text-red-500"
-                  style={{
-                    color: "red",
-                    fontSize: "1.1rem",
-                    fontWeight: "500",
-                  }}
-                >
-                  <ErrorMessage name="firstName" className="text-red-500" />
-                </p>
-              </div> */}
-
               <div className="mb-4">
                 <div className="flex-style">
                   <label

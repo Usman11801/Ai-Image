@@ -83,7 +83,7 @@ const Navbar = () => {
           {showOptions && (
             <div className="options">
               <ul>
-                <li className="link-li">
+                <li className="link-li" onClick={() => setShowOptions(false)}>
                   <NavLink
                     className="navLinkStyle"
                     to="/accounts"

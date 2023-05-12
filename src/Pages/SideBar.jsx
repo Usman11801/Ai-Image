@@ -8,6 +8,9 @@ import { Slider } from "antd";
 import { css } from "@emotion/react";
 import { ClipLoader } from "react-spinners";
 
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 const override = css`
   display: block;
   margin: 0 auto;
@@ -44,7 +47,7 @@ const SideBar = () => {
   const [selectedDot, setSelectedDot] = useState(1);
 
   const [numberImages, setNumberImages] = useState(1);
-  const [ratio, setRatio] = useState();
+  const [ratio, setRatio] = useState("1:1");
   const [inputValue, setInputValue] = useState("");
 
   const imageRef = useRef(null);
@@ -76,11 +79,11 @@ const SideBar = () => {
   };
 
   const handleChange = (newValue) => {
-    console.log("newValue:", newValue);
+    // console.log("newValue:", newValue);
     // if (newValue === 1 || newValue === 2 || newValue === 3 || newValue === 4) {
     // }
     setNumberImages(newValue);
-    console.log("value==", numberImages);
+    // console.log("value==", numberImages);
   };
 
   const handleDotClick = (dotNumber) => {
@@ -112,7 +115,7 @@ const SideBar = () => {
   const handleCardClick = (cardIndex) => {
     setSelectedCardIndex(cardIndex);
   };
-  const [styleCard, setStyleCard] = useState();
+  const [styleCard, setStyleCard] = useState("cinematic");
 
   const handleCardStyleClick = (card, cardIndex) => {
     setStyleCard(card);
@@ -340,39 +343,69 @@ const SideBar = () => {
   ];
   const [saveImage, setSaveImage] = useState();
 
-  const clickGenerate = () => {
-    debugger;
-    setLoading(true);
+  const clickGenerate = async () => {
+    try {
+      setLoading(true);
+      const id = localStorage.getItem("id");
+      const data = {
+        num_images: numberImages,
+        ratio: ratio?.title,
+        style: styleCard.title,
+        user: id,
+        text_input: inputValue,
+        negative_input: "blue",
+      };
 
-    console.log("numberImages", numberImages);
-    console.log("ratio", ratio);
-    console.log("styleCard", styleCard);
-    console.log("inputValue", inputValue);
-    const id = localStorage.getItem("id");
-    const data = {
-      num_images: numberImages,
-      ratio: ratio?.title,
-      style: styleCard.title,
-      id: id,
-      text_input: inputValue,
-      negative_input: "blue",
-    };
+      const response = await fetch(
+        "http://127.0.0.1:5000/api/generate/images/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        }
+      );
 
-    fetch("http://127.0.0.1:5000/api/generate/images/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data?.image_urls);
-        setSaveImage(data.image_urls);
-        console.log("saveImage,", saveImage[0], "and", saveImage[1]);
-        // setLoading(false);
-      })
-      .catch((error) => console.error(error));
+      if (!response.ok) {
+        // console.log("response", response);
+        setLoading(false);
+        throw new Error("no more credits");
+      }
+
+      const responseData = await response.json();
+      setSaveImage(responseData.image_urls);
+      // setLoading(false);
+    } catch (error) {
+      // setLoading(false);
+      toast.error("Error: " + error.message);
+    }
+
+    // setLoading(true);
+    // const id = localStorage.getItem("id");
+    // const data = {
+    //   num_images: numberImages,
+    //   ratio: ratio?.title,
+    //   style: styleCard.title,
+    //   user: id,
+    //   text_input: inputValue,
+    //   negative_input: "blue",
+    // };
+
+    // fetch("http://127.0.0.1:5000/api/generate/images/", {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify(data),
+    // })
+    //   .then((response) => response.json())
+    //   .then((data) => {
+    //     setSaveImage(data.image_urls);
+    //   })
+    //   .catch((error) => {
+    //     toast.error("No more credits. Please buy more credits.");
+    //   });
   };
 
   return (
@@ -472,10 +505,36 @@ const SideBar = () => {
                         border: "none",
                         color: "blue",
                       }}
+                      tooltipVisible
+                      tipFormatter={(value) => `${value}`}
                     />
                   </div>
                 </div>{" "}
               </div>
+              {/* ///////////////////////////////// */}
+              <div>
+                <div>
+                  <p
+                    style={{
+                      color: "#B6EEF5",
+                      fontSize: "1.2rem",
+                      fontFamily: "Tomorrow",
+                      fontStyle: "italic",
+                      paddingLeft: "4%",
+                      paddingTop: "4%",
+                    }}
+                  >
+                    Algorithm
+                  </p>
+                </div>
+                <div className="mt-3 dropdown dropDown-Algo">
+                  <div className="styles" style={{ color: "black" }}>
+                    Stable
+                  </div>
+                  <img className="errowIcone" src={errowDown} />
+                </div>
+              </div>
+
               {/* ////////////////////////////// */}
               <div
                 className="mt-3 dropdown dropDown-backgound"
@@ -672,6 +731,8 @@ const SideBar = () => {
       <Grid item xs={9}>
         <Paper style={styles.content}>
           <div className="Main-Content">
+            <ToastContainer />
+
             <div className="flex align-item contentSetting">
               {/* <div className="card cardSize"></div> */}
 
@@ -753,7 +814,11 @@ const SideBar = () => {
                             )}
                           </>
                         ) : (
-                          <img style={{ width: "100%" }} src={saveImage[0]} />
+                          <img
+                            style={{ width: "100%" }}
+                            src={saveImage[0]}
+                            ref={imageRef}
+                          />
                         )}
                       </>
                     ) : (
